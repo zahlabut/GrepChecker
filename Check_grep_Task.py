@@ -3,3 +3,4 @@ import sys
 
 
 
+print 'stam'
