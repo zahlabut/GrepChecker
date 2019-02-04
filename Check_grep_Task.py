@@ -202,9 +202,16 @@ os.system(com)
 verdict_dic[test_name]=your_verdict()
 
 
+### Result ###
+print_in_color('\n\n\nExecuted test cases:','green')
 print_dic(verdict_dic)
 score=len([key for key in verdict_dic.keys() if verdict_dic[key]=='OK'])*100/len(verdict_dic)
 spec_print(['The final grade is:',str(score)])
+
+### Test code
+### Test 2 or more files
+### Test if OOP
+
 
 
 
