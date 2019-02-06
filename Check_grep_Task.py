@@ -101,10 +101,14 @@ def print_dic(dic):
         print k,' --> ',dic[k]
 
 def your_verdict():
-    verdict=choose_option_from_list(['Fail', 'OK'], 'Enter your verdict?')[1]
-    if verdict == 'Fail':
-        verdict = raw_input('Explain why: ')
-    return verdict
+    try:
+        score = input('Enter your score (0-100):')
+    except Exception,e:
+        print e
+        score=your_verdict()
+    if score<0 or score>100:
+        score = your_verdict()
+    return score
 
 ### Check if pep8 is installed ###
 return_code=exec_command_line_command('pycodestyle -h')['ReturnCode']
@@ -114,98 +118,98 @@ if return_code!=0:
 
 ### Candidat script file to check ###
 files=[fil for fil in os.listdir('.') if fil.endswith('.py') and fil!='Check_grep_Task.py']
-test_script=choose_option_from_list(files, 'Choose file to test:')[1]
+test_script=choose_option_from_list(files, "Choose candidate's script file to test:")[1]
 
-# ### Usage ###
-# test_name='Check usage'
-# spec_print([test_name])
-# com='python ' + test_script + ' -h'
-# print_in_color('--> ' + com, 'blue')
-# os.system(com)
-# time.sleep(1)
-# verdict_dic[test_name] = your_verdict()
-#
-# ### Single file - basic tests ###
-# for opt in options:
-#     test_name='Basic test - single file + '+opt+' option'
-#     spec_print([test_name])
-#     expected_output='File:'+test_file_1+'\n'+exec_command_line_command('grep -n -E '+regex+' '+test_file_1)['CommandOutput']
-#     print_in_color('Expected lines in output:\n'+expected_output,'green')
-#     print_in_color('\nActual output is:\n','bold')
-#     com='python ' + test_script + ' -f ' + test_file_1 + ' -r '+regex+' '+opt
-#     print_in_color('--> ' + com, 'blue')
-#     os.system(com)
-#     time.sleep(1)
-#     verdict_dic[test_name]=your_verdict()
-#
-# ### Two files - basic tests ###
-# for opt in options:
-#     test_name='Basic test - two files + '+opt+' option'
-#     spec_print([test_name])
-#     expected_output=exec_command_line_command('grep -n -E '+regex+' '+test_file_1+' '+test_file_2)['CommandOutput']
-#     print_in_color('Expected lines in output:\n'+expected_output,'green')
-#     com='python ' +test_script+' -f '+test_file_1+' '+test_file_2+' -r '+regex+' -c'
-#     print_in_color('--> ' + com, 'blue')
-#     os.system(com)
-#     time.sleep(1)
-#     verdict_dic[test_name]=your_verdict()
-#
-#
-# ### All lines starts with given by regex character ###
-# for opt in options:
-#     test_name='All lines started with: ('+start_line_regex+') '+opt+' option'
-#     spec_print([test_name])
-#     expected_output='File:'+test_file_1+'\n'+exec_command_line_command('grep -n -E '+start_line_regex+' '+test_file_1)['CommandOutput']
-#     print_in_color('Expected lines in output:\n'+expected_output,'green')
-#     print_in_color('\nActual output is:\n','bold')
-#     com='python ' + test_script + ' -f ' + test_file_1 + ' -r '+regex+' '+opt
-#     print_in_color('--> ' + com, 'blue')
-#     os.system(com)
-#     time.sleep(1)
-#     verdict_dic[test_name]=your_verdict()
-#
-#
-# ### PEP8 Validator ###
-# test_name='PEP8 - Validation'
-# spec_print([test_name])
-# os.system('pycodestyle '+test_script)
-# time.sleep(1)
-# verdict_dic[test_name]=your_verdict()
-#
-# ### Negative - no file option is provided ###
-# test_name='PEP8 - no file option is provided'
-# spec_print([test_name])
-# print_in_color('Expect: Standard input supposed to be used','yellow')
-# print_in_color('Note: available test files to use as input file/s are: "stam1" and "stam2"','yellow')
-# com='python ' +test_script+' -r '+regex+' -u'
-# print_in_color('--> '+com,'blue')
-# os.system(com)
-# time.sleep(1)
-# verdict_dic[test_name]=your_verdict()
-#
-# ### Negative - not valid REGEX ###
-# test_name='Negative test case - no file option is provided'
-# spec_print([test_name])
-# com='python ' + test_script + ' -f ' + test_file_1 + ' -r '+not_valid_regex
-# print_in_color('--> '+com,'blue')
-# os.system(com)
-# time.sleep(1)
-# verdict_dic[test_name]=your_verdict()
-#
-# ### Negative - not existing file ###
-# test_name='Negative test case - not existing input file'
-# spec_print([test_name])
-# com='python '+test_script+' -f ZABABUN -r '+regex+' -u'
-# print_in_color('--> '+com,'blue')
-# time.sleep(1)
-# os.system(com)
-# verdict_dic[test_name]=your_verdict()
-#
+### Usage ###
+test_name="--- Check script's usage ---"
+spec_print([test_name])
+com='python ' + test_script + ' -h'
+print_in_color('--> ' + com, 'blue')
+os.system(com)
+time.sleep(0.3)
+verdict_dic[test_name] = your_verdict()
+
+### Single file - basic tests ###
+for opt in options:
+    test_name='--- Basic test - single file + '+opt+' option ---'
+    spec_print([test_name])
+    expected_output='File:'+test_file_1+'\n'+exec_command_line_command('grep -n -E '+regex+' '+test_file_1)['CommandOutput']
+    print_in_color('Identical grep result:\n'+expected_output,'green')
+    print_in_color('\nActual output is:\n','bold')
+    com='python ' + test_script + ' -f ' + test_file_1 + ' -r '+regex+' '+opt
+    print_in_color('--> ' + com, 'blue')
+    os.system(com)
+    time.sleep(0.3)
+    verdict_dic[test_name]=your_verdict()
+
+### Two files - basic tests ###
+for opt in options:
+    test_name='--- Basic test - two files + '+opt+' option ---'
+    spec_print([test_name])
+    expected_output=exec_command_line_command('grep -n -E '+regex+' '+test_file_1+' '+test_file_2)['CommandOutput']
+    print_in_color('Identical grep result:\n'+expected_output,'green')
+    com='python ' +test_script+' -f '+test_file_1+' '+test_file_2+' -r '+regex+' '+opt
+    print_in_color('--> ' + com, 'blue')
+    os.system(com)
+    time.sleep(0.3)
+    verdict_dic[test_name]=your_verdict()
+
+
+### All lines starts with given by regex character ###
+for opt in options:
+    test_name='--- All lines started with: ('+start_line_regex+') '+opt+' option ---'
+    spec_print([test_name])
+    expected_output='File:'+test_file_1+'\n'+exec_command_line_command('grep -n -E '+start_line_regex+' '+test_file_1)['CommandOutput']
+    print_in_color('Identical grep result:\n'+expected_output,'green')
+    print_in_color('\nActual output is:\n','bold')
+    com='python ' + test_script + ' -f ' + test_file_1 + ' -r '+start_line_regex+' '+opt
+    print_in_color('--> ' + com, 'blue')
+    os.system(com)
+    time.sleep(0.3)
+    verdict_dic[test_name]=your_verdict()
+
+
+### PEP8 Validator ###
+test_name='--- PEP8 - Validation ---'
+spec_print([test_name])
+os.system('pycodestyle '+test_script)
+time.sleep(0.3)
+verdict_dic[test_name]=your_verdict()
+
+### Negative - no file option is provided ###
+test_name="--- STDIN test - file option (-f --file) is not in use ---"
+spec_print([test_name])
+print_in_color('Expected: STDIN should to be used to get the file/s name','yellow')
+print_in_color('Note: available test files to use as input file/s are: "stam1" and "stam2"','yellow')
+com='python ' +test_script+' -r '+regex+' -u'
+print_in_color('--> '+com,'blue')
+os.system(com)
+time.sleep(0.3)
+verdict_dic[test_name]=your_verdict()
+
+### Negative - not valid REGEX ###
+test_name='--- Negative test case - no file option is provided ---'
+spec_print([test_name])
+com='python ' + test_script + ' -f ' + test_file_1 + ' -r '+not_valid_regex
+print_in_color('--> '+com,'blue')
+os.system(com)
+time.sleep(0.3)
+verdict_dic[test_name]=your_verdict()
+
+### Negative - not existing file ###
+test_name='--- Negative test case - not existing input file ---'
+spec_print([test_name])
+com='python '+test_script+' -f ZABABUN -r '+regex+' -u'
+print_in_color('--> '+com,'blue')
+time.sleep(0.3)
+os.system(com)
+verdict_dic[test_name]=your_verdict()
+
 
 
 
 ### Test if other modules are imported ###
-test_name='Check imported python files in the main one'
+test_name='--- Check if other Python files are imported inside the main one ---'
 spec_print([test_name])
 all_files=[fil for fil in os.listdir('.') if fil.endswith('.py')]
 tool_files=[]
@@ -221,7 +225,7 @@ else:
 verdict_dic[test_name]=your_verdict()
 
 ### Test if OOP ###
-test_name = 'Check if code is OOP'
+test_name = '--- Check if code is OOP ---'
 tool_files.append(test_script)
 classes=[]
 for fil in tool_files:
@@ -235,18 +239,10 @@ else:
 verdict_dic[test_name] = your_verdict()
 
 ### Result ###
-print_in_color('\n\n\nExecuted test cases:','green')
+print_in_color('\n\n\n--- Executed test cases ---','green')
 print_dic(verdict_dic)
-score=len([key for key in verdict_dic.keys() if verdict_dic[key]=='OK'])*100/len(verdict_dic)
-spec_print(['The final grade is:',str(score)])
-### Test OOP ###
-
-
-### Test code
-
-
-
-
-
-
-
+score=sum([int(verdict_dic[key]) for key in verdict_dic.keys()])/len(verdict_dic)
+if score<60:
+    print_in_color('The final grade is:'+str(score),'red')
+else:
+    print_in_color('The final grade is:' + str(score), 'green')
