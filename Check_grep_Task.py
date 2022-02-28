@@ -34,27 +34,36 @@ def print_in_color(string, color_or_format=None):
         UNDERLINE = '\033[4m'
 
     if color_or_format == 'green':
-        print bcolors.OKGREEN + string + bcolors.ENDC
+        print(bcolors.OKGREEN + string + bcolors.ENDC)
     elif color_or_format == 'red':
-        print bcolors.FAIL + string + bcolors.ENDC
+        print(bcolors.FAIL + string + bcolors.ENDC)
     elif color_or_format == 'yellow':
-        print bcolors.WARNING + string + bcolors.ENDC
+        print(bcolors.WARNING + string + bcolors.ENDC)
     elif color_or_format == 'blue':
-        print bcolors.OKBLUE + string + bcolors.ENDC
+        print(bcolors.OKBLUE + string + bcolors.ENDC)
     elif color_or_format == 'bold':
-        print bcolors.BOLD + string + bcolors.ENDC
+        print(bcolors.BOLD + string + bcolors.ENDC)
     else:
-        print string
+        print(string)
 
 def exec_command_line_command(command):
     try:
         command_as_list = command.split(' ')
         command_as_list = [item.replace(' ', '') for item in command_as_list if item != '']
-        result = subprocess.check_output(command, shell=True)
-        return {'ReturnCode': 0, 'CommandOutput': result}
+        result = subprocess.check_output(command, shell=True, encoding='UTF-8', stderr=subprocess.STDOUT, stdin=True)
+        json_output = None
+        try:
+            json_output = json.loads(result.lower())
+        except:
+            pass
+        return {'ReturnCode': 0, 'CommandOutput': result, 'JsonOutput': json_output}
     except subprocess.CalledProcessError as e:
-        print_in_color(str(e),'red')
-        return {'ReturnCode': e.returncode, 'CommandOutput': str(e)}
+        if 'wget -r' not in command:
+            print_in_color(command,'red')
+            print_in_color(e.output, 'red')
+        return {'ReturnCode': e.returncode, 'CommandOutput': e.output}
+
+
 
 def spec_print(string_list,color=None):
     len_list=[]
@@ -68,27 +77,27 @@ def spec_print(string_list,color=None):
     print_in_color("#"*max_len+'\n',color)
 
 def choose_option_from_list(list_object, msg):
-    print ''
+    print('')
     try:
         if (len(list_object)==0):
-            print "Nothing to choose :( "
-            print "Execution will stop!"
+            print("Nothing to choose :( ")
+            print("Execution will stop!")
             time.sleep(5)
             exit("Connot continue execution!!!")
             sys.exit(1)
-        print msg
+        print(msg)
         counter=1
         for item in list_object:
-            print str(counter)+') - '+item
+            print(str(counter)+') - '+item)
             counter=counter+1
-        choosed_option=raw_input("Choose option by entering the suitable number! ")
+        choosed_option=input("Choose option by entering the suitable number! ")
         while (int(choosed_option)<0 or int(choosed_option)> len(list_object)):
-            print "No such option - ", choosed_option
-            choosed_option=raw_input("Choose option by entering the suitable number! ")
+            print("No such option - ", choosed_option)
+            choosed_option=input("Choose option by entering the suitable number! ")
         print_in_color("Option is: '"+list_object[int(choosed_option)-1]+"'"+'\n','bold')
         return [True,list_object[int(choosed_option)-1]]
-    except Exception, e:
-        print '*** No such option!!!***', e
+    except Exception as e:
+        print('*** No such option!!!***', e)
         return[False, str(e)]
 
 def exit(string):
@@ -97,14 +106,14 @@ def exit(string):
 
 def print_dic(dic):
     for k in dic.keys():
-        print '~'*80
-        print k,' --> ',dic[k]
+        print('~'*80)
+        print(k,' --> ',dic[k])
 
 def your_verdict():
     try:
-        score = input('Enter your score (0-100):')
-    except Exception,e:
-        print e
+        score = int(input('Enter your score (0-100):'))
+    except Exception as e:
+        print(e)
         score=your_verdict()
     if score<0 or score>100:
         score = your_verdict()
@@ -113,7 +122,7 @@ def your_verdict():
 ### Check if pep8 is installed ###
 return_code=exec_command_line_command('pycodestyle -h')['ReturnCode']
 if return_code!=0:
-    print "You don't have python pycodestyle(pep8) module installed\nFollow https://pypi.org/project/pycodestyle/ to install it"
+    print("You don't have python pycodestyle(pep8) module installed\nFollow https://pypi.org/project/pycodestyle/ to install it")
     exit('Cannot continue execution :(')
 
 ### Candidat script file to check ###
@@ -123,7 +132,7 @@ test_script=choose_option_from_list(files, "Choose candidate's script file to te
 ### Usage ###
 test_name="--- Check script's usage ---"
 spec_print([test_name])
-com='python ' + test_script + ' -h'
+com='python3 ' + test_script + ' -h'
 print_in_color('--> ' + com, 'blue')
 os.system(com)
 time.sleep(0.3)
@@ -136,7 +145,7 @@ for opt in options:
     expected_output='File:'+test_file_1+'\n'+exec_command_line_command('grep -n -E '+regex+' '+test_file_1)['CommandOutput']
     print_in_color('Identical grep result:\n'+expected_output,'green')
     print_in_color('\nActual output is:\n','bold')
-    com='python ' + test_script + ' -f ' + test_file_1 + ' -r '+regex+' '+opt
+    com='python3 ' + test_script + ' -f ' + test_file_1 + ' -r '+regex+' '+opt
     print_in_color('--> ' + com, 'blue')
     os.system(com)
     time.sleep(0.3)
@@ -148,7 +157,7 @@ for opt in options:
     spec_print([test_name])
     expected_output=exec_command_line_command('grep -n -E '+regex+' '+test_file_1+' '+test_file_2)['CommandOutput']
     print_in_color('Identical grep result:\n'+expected_output,'green')
-    com='python ' +test_script+' -f '+test_file_1+' '+test_file_2+' -r '+regex+' '+opt
+    com='python3 ' +test_script+' -f '+test_file_1+' '+test_file_2+' -r '+regex+' '+opt
     print_in_color('--> ' + com, 'blue')
     os.system(com)
     time.sleep(0.3)
@@ -162,7 +171,7 @@ for opt in options:
     expected_output='File:'+test_file_1+'\n'+exec_command_line_command('grep -n -E '+start_line_regex+' '+test_file_1)['CommandOutput']
     print_in_color('Identical grep result:\n'+expected_output,'green')
     print_in_color('\nActual output is:\n','bold')
-    com='python ' + test_script + ' -f ' + test_file_1 + ' -r '+start_line_regex+' '+opt
+    com='python3 ' + test_script + ' -f ' + test_file_1 + ' -r '+start_line_regex+' '+opt
     print_in_color('--> ' + com, 'blue')
     os.system(com)
     time.sleep(0.3)
@@ -181,7 +190,7 @@ test_name="--- STDIN test - file option (-f --file) is not in use ---"
 spec_print([test_name])
 print_in_color('Expected: STDIN should to be used to get the file/s name','yellow')
 print_in_color('Note: available test files to use as input file/s are: "stam1" and "stam2"','yellow')
-com='python ' +test_script+' -r '+regex+' -u'
+com='python3 ' +test_script+' -r '+regex+' -u'
 print_in_color('--> '+com,'blue')
 os.system(com)
 time.sleep(0.3)
@@ -190,7 +199,7 @@ verdict_dic[test_name]=your_verdict()
 ### Negative - not valid REGEX ###
 test_name='--- Negative test case - no file option is provided ---'
 spec_print([test_name])
-com='python ' + test_script + ' -f ' + test_file_1 + ' -r '+not_valid_regex
+com='python3 ' + test_script + ' -f ' + test_file_1 + ' -r '+not_valid_regex
 print_in_color('--> '+com,'blue')
 os.system(com)
 time.sleep(0.3)
@@ -199,7 +208,7 @@ verdict_dic[test_name]=your_verdict()
 ### Negative - not existing file ###
 test_name='--- Negative test case - not existing input file ---'
 spec_print([test_name])
-com='python '+test_script+' -f ZABABUN -r '+regex+' -u'
+com='python3 '+test_script+' -f ZABABUN -r '+regex+' -u'
 print_in_color('--> '+com,'blue')
 time.sleep(0.3)
 os.system(com)
